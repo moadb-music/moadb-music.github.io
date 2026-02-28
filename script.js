@@ -13,31 +13,67 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 100 * index);
     });
 
-    // Lógica de Redirecionamento Robusta (Iframe Fallback)
+    // Lógica de Redirecionamento Robusta
     linkCards.forEach((link) => {
         link.addEventListener('click', (e) => {
-            const appUrl = link.getAttribute('data-app');
+            const platform = link.getAttribute('data-platform');
             const webUrl = link.getAttribute('href');
 
-            if (link.id === 'pix-button' || !appUrl) return;
+            if (link.id === 'pix-button' || !platform) return;
 
             e.preventDefault();
 
-            // Tenta abrir o app usando um método que não quebra o navegador interno
-            const iframe = document.createElement("iframe");
-            iframe.style.border = "none";
-            iframe.style.width = "1px";
-            iframe.style.height = "1px";
-            iframe.src = appUrl;
-            document.body.appendChild(iframe);
+            const isAndroid = /Android/i.test(navigator.userAgent);
+            const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-            // Plano B: Se o usuário ainda estiver na página após 1.5s, vai para a web
-            setTimeout(() => {
-                if (!document.hidden) {
+            let appUrl = "";
+
+            // Configuração de Deep Links por plataforma
+            const platformConfig = {
+                spotify: {
+                    ios: "spotify:album:0cxPVUYmdkyhaQhrKxl0cB",
+                    android: "intent://open.spotify.com/album/0cxPVUYmdkyhaQhrKxl0cB#Intent;package=com.spotify.music;scheme=https;end"
+                },
+                apple: {
+                    ios: "music://music.apple.com/br/album/silent-rebirth/1880815219",
+                    android: "intent://music.apple.com/br/album/silent-rebirth/1880815219#Intent;package=com.apple.android.music;scheme=https;end"
+                },
+                deezer: {
+                    ios: "deezer://www.deezer.com/album/927562671",
+                    android: "intent://www.deezer.com/album/927562671#Intent;package=deezer.android.app;scheme=https;end"
+                },
+                youtube: {
+                    ios: "youtubemusic://music.youtube.com/playlist?list=OLAK5uy_l1jQK4tpXSpVEF8ITQLCyHLGq9jdChC-g",
+                    android: "intent://music.youtube.com/playlist?list=OLAK5uy_l1jQK4tpXSpVEF8ITQLCyHLGq9jdChC-g#Intent;package=com.google.android.apps.youtube.music;scheme=https;end"
+                }
+            };
+
+            if (isAndroid) {
+                appUrl = platformConfig[platform].android;
+                window.location.href = appUrl;
+            } else if (isIOS) {
+                appUrl = platformConfig[platform].ios;
+                window.location.href = appUrl;
+            } else {
+                window.location.href = webUrl;
+                return;
+            }
+
+            // Plano B: Se após 2.5 segundos o usuário ainda estiver na página, vai para a web
+            const startTime = Date.now();
+            const checkSuspended = setInterval(() => {
+                const timePassed = Date.now() - startTime;
+                
+                if (document.hidden || document.webkitHidden) {
+                    clearInterval(checkSuspended);
+                    return;
+                }
+
+                if (timePassed > 2500) {
+                    clearInterval(checkSuspended);
                     window.location.href = webUrl;
                 }
-                document.body.removeChild(iframe);
-            }, 1500);
+            }, 500);
         });
     });
 
