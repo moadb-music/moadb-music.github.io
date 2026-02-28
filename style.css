@@ -82,10 +82,9 @@ h1 { font-size: 1.4rem; letter-spacing: 3px; text-transform: uppercase; }
 
 .support-pix { border-color: rgba(139, 0, 0, 0.5); margin-top: 10px; }
 
-/* Toast Visualmente Forte - Topo da Tela */
 .toast-notification {
     position: fixed;
-    top: -100px; /* Começa fora da tela */
+    top: -100px;
     left: 50%;
     transform: translateX(-50%);
     background: linear-gradient(135deg, #1a1a1a 0%, #000 100%);
@@ -96,16 +95,14 @@ h1 { font-size: 1.4rem; letter-spacing: 3px; text-transform: uppercase; }
     font-weight: 700;
     letter-spacing: 2px;
     text-transform: uppercase;
-    border: 1px solid var(--accent-red);
+    border: 1px solid #8b0000;
     box-shadow: 0 0 20px rgba(139, 0, 0, 0.4);
     z-index: 9999;
     transition: top 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55), opacity 0.3s;
     opacity: 0;
-    white-space: nowrap;
 }
-
 .toast-notification.show {
-    top: 30px; /* Desce para o topo */
+    top: 30px;
     opacity: 1;
 }
 

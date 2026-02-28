@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const linkCards = document.querySelectorAll('.link-card');
     const pixButton = document.getElementById('pix-button');
     
-    // Animação de entrada
+    // Animação inicial
     linkCards.forEach((card, index) => {
         card.style.opacity = '0';
         card.style.transform = 'translateY(15px)';
@@ -13,41 +13,42 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 100 * index);
     });
 
-    // Lógica de Redirecionamento SEGURA (Sem abrir novas abas/pop-ups)
+    // Lógica de Redirecionamento Robusta (Iframe Fallback)
     linkCards.forEach((link) => {
         link.addEventListener('click', (e) => {
             const appUrl = link.getAttribute('data-app');
             const webUrl = link.getAttribute('href');
 
-            // Ignorar para PIX e Redes Sociais (que já abrem direto pelo href)
             if (link.id === 'pix-button' || !appUrl) return;
 
             e.preventDefault();
 
-            // 1. Tenta disparar o App (Isso não abre nova aba, apenas tenta "chamar" o app)
-            window.location.href = appUrl;
+            // Tenta abrir o app usando um método que não quebra o navegador interno
+            const iframe = document.createElement("iframe");
+            iframe.style.border = "none";
+            iframe.style.width = "1px";
+            iframe.style.height = "1px";
+            iframe.src = appUrl;
+            document.body.appendChild(iframe);
 
-            // 2. Plano B: Se o fã ainda estiver nesta página após 1 segundo, 
-            // significa que o app não abriu. Então mudamos a aba atual para o site.
+            // Plano B: Se o usuário ainda estiver na página após 1.5s, vai para a web
             setTimeout(() => {
                 if (!document.hidden) {
                     window.location.href = webUrl;
                 }
-            }, 1000); 
+                document.body.removeChild(iframe);
+            }, 1500);
         });
     });
 
-    // Lógica do PIX (Mantida conforme solicitado)
+    // Lógica do PIX (Toast no Topo)
     if (pixButton) {
         pixButton.addEventListener('click', (e) => {
             e.preventDefault();
             const pixKey = "d9c7d8b2-52f0-4709-a8d0-ca826b1b7def"; 
-            
             navigator.clipboard.writeText(pixKey).then(() => {
                 if (navigator.vibrate) navigator.vibrate([30, 50, 30]); 
                 showToast("CHAVE PIX COPIADA! 🤘");
-            }).catch(() => {
-                alert("Chave PIX: " + pixKey);
             });
         });
     }
@@ -61,8 +62,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         toast.textContent = message;
         setTimeout(() => toast.classList.add('show'), 10);
-        setTimeout(() => {
-            toast.classList.remove('show');
-        }, 3500);
+        setTimeout(() => toast.classList.remove('show'), 3500);
     }
 });
