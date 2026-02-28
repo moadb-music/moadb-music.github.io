@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const platform = link.getAttribute('data-platform');
             const webUrl = link.getAttribute('href');
 
+            // Se for PIX ou redes sociais (sem data-platform), segue o fluxo normal
             if (link.id === 'pix-button' || !platform) return;
 
             e.preventDefault();
@@ -32,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const platformConfig = {
                 spotify: {
                     ios: "spotify:album:0cxPVUYmdkyhaQhrKxl0cB",
-                    android: "intent://open.spotify.com/album/0cxPVUYmdkyhaQhrKxl0cB#Intent;package=com.spotify.music;scheme=https;end"
+                    android: "intent://album/0cxPVUYmdkyhaQhrKxl0cB#Intent;scheme=spotify;package=com.spotify.music;end"
                 },
                 apple: {
                     ios: "music://music.apple.com/br/album/silent-rebirth/1880815219",
@@ -50,30 +51,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (isAndroid) {
                 appUrl = platformConfig[platform].android;
-                window.location.href = appUrl;
             } else if (isIOS) {
                 appUrl = platformConfig[platform].ios;
-                window.location.href = appUrl;
             } else {
                 window.location.href = webUrl;
                 return;
             }
 
-            // Plano B: Se após 2.5 segundos o usuário ainda estiver na página, vai para a web
-            const startTime = Date.now();
-            const checkSuspended = setInterval(() => {
-                const timePassed = Date.now() - startTime;
-                
-                if (document.hidden || document.webkitHidden) {
-                    clearInterval(checkSuspended);
-                    return;
-                }
+            // Tenta abrir o App
+            window.location.href = appUrl;
 
-                if (timePassed > 2500) {
-                    clearInterval(checkSuspended);
+            // Plano B: Fallback para Web se o App não abrir em 2 segundos
+            setTimeout(() => {
+                if (!document.hidden && !document.webkitHidden) {
                     window.location.href = webUrl;
                 }
-            }, 500);
+            }, 2000);
         });
     });
 
@@ -97,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.body.appendChild(toast);
         }
         toast.textContent = message;
-        setTimeout(() => toast.classList.add('show'), 10);
+        toast.classList.add('show');
         setTimeout(() => toast.classList.remove('show'), 3500);
     }
 });
