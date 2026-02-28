@@ -13,11 +13,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 100 * index);
     });
 
-    // Lógica de Redirecionamento com Iframe (Específica para Instagram)
+    // Lógica de Redirecionamento
     linkCards.forEach((link) => {
         link.addEventListener('click', (e) => {
             const platform = link.getAttribute('data-platform');
             const webUrl = link.getAttribute('href');
+            const isInstagram = /Instagram/i.test(navigator.userAgent); // Detecta se está no navegador do IG
 
             if (link.id === 'pix-button' || !platform) return;
 
@@ -27,26 +28,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 spotify: "spotify:album:0cxPVUYmdkyhaQhrKxl0cB",
                 apple: "music://music.apple.com/br/album/silent-rebirth/1880815219",
                 deezer: "deezer://www.deezer.com/album/927562671",
-                youtube: "youtubemusic://music.youtube.com/playlist?list=OLAK5uy_l1jQK4tpXSpVEF8ITQLCyHLGq9jdChC-g"
+                youtube: "youtubemusic://music.youtube.com/playlist?list=OLAK5uy_l1jQK4tpXSpVEF8ITQLCyHLGq9jdChC-g",
+                tiktok: "snssdk1180://user/profile/mind.of.a.dead.bo" // Protocolo nativo do TikTok
             };
 
-            const appUrl = platformConfig[platform];
+            const appUrl = platformConfig[platform] || webUrl;
 
-            // Técnica do Iframe Oculto para evitar a tela de erro do Instagram
+            // Para o Instagram, o Iframe é mais seguro para não travar a página
             const iframe = document.createElement("iframe");
             iframe.style.display = "none";
             iframe.src = appUrl;
             document.body.appendChild(iframe);
 
-            // Remove o iframe e redireciona para a web após um curto período
+            // Redirecionamento de Fallback (Web)
             setTimeout(() => {
-                document.body.removeChild(iframe);
+                if (document.body.contains(iframe)) {
+                    document.body.removeChild(iframe);
+                }
+                // Se ainda estiver na página, manda para a web
                 window.location.href = webUrl;
-            }, 300);
+            }, 400);
         });
     });
 
-    // Lógica do PIX (Mantida conforme original)
+    // Lógica do PIX (Toast no Topo)
     if (pixButton) {
         pixButton.addEventListener('click', (e) => {
             e.preventDefault();
