@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const linkCards = document.querySelectorAll('.link-card');
     const pixButton = document.getElementById('pix-button');
     
-    // Animação inicial (mantida)
+    // Animação inicial
     linkCards.forEach((card, index) => {
         card.style.opacity = '0';
         card.style.transform = 'translateY(15px)';
@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 100 * index);
     });
 
-    // Lógica de Redirecionamento com Sobrescrita de Web
+    // Lógica de Redirecionamento com Iframe (Específica para Instagram)
     linkCards.forEach((link) => {
         link.addEventListener('click', (e) => {
             const platform = link.getAttribute('data-platform');
@@ -23,7 +23,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             e.preventDefault();
 
-            // Protocolos Diretos (Mais rápidos para disparar o SO)
             const platformConfig = {
                 spotify: "spotify:album:0cxPVUYmdkyhaQhrKxl0cB",
                 apple: "music://music.apple.com/br/album/silent-rebirth/1880815219",
@@ -33,15 +32,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const appUrl = platformConfig[platform];
 
-            // 1. Tenta abrir o App (Isso não muda a página se falhar)
-            window.location.href = appUrl;
+            // Técnica do Iframe Oculto para evitar a tela de erro do Instagram
+            const iframe = document.createElement("iframe");
+            iframe.style.display = "none";
+            iframe.src = appUrl;
+            document.body.appendChild(iframe);
 
-            // 2. Após meio segundo, força a ida para a Web
-            // Se o app abriu, o navegador fica em background e esse comando é ignorado ou processado ao voltar.
-            // Se o app NÃO abriu, a página da web carrega antes do erro de "página não encontrada".
+            // Remove o iframe e redireciona para a web após um curto período
             setTimeout(() => {
+                document.body.removeChild(iframe);
                 window.location.href = webUrl;
-            }, 500);
+            }, 300);
         });
     });
 
