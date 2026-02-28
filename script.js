@@ -13,13 +13,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 100 * index);
     });
 
-    // Lógica de Redirecionamento Robusta
+    // Lógica de Redirecionamento Robusta com Fallback
     linkCards.forEach((link) => {
         link.addEventListener('click', (e) => {
             const platform = link.getAttribute('data-platform');
             const webUrl = link.getAttribute('href');
 
-            // Se for PIX ou redes sociais (sem data-platform), segue o fluxo normal
             if (link.id === 'pix-button' || !platform) return;
 
             e.preventDefault();
@@ -29,44 +28,42 @@ document.addEventListener('DOMContentLoaded', () => {
 
             let appUrl = "";
 
-            // Configuração de Deep Links por plataforma
+            // Configuração de Deep Links com Fallback nativo para Android (S.browser_fallback_url)
             const platformConfig = {
                 spotify: {
                     ios: "spotify:album:0cxPVUYmdkyhaQhrKxl0cB",
-                    android: "intent://album/0cxPVUYmdkyhaQhrKxl0cB#Intent;scheme=spotify;package=com.spotify.music;end"
+                    android: `intent://album/0cxPVUYmdkyhaQhrKxl0cB#Intent;scheme=spotify;package=com.spotify.music;S.browser_fallback_url=${encodeURIComponent(webUrl)};end`
                 },
                 apple: {
                     ios: "music://music.apple.com/br/album/silent-rebirth/1880815219",
-                    android: "intent://music.apple.com/br/album/silent-rebirth/1880815219#Intent;package=com.apple.android.music;scheme=https;end"
+                    android: `intent://music.apple.com/br/album/silent-rebirth/1880815219#Intent;package=com.apple.android.music;scheme=https;S.browser_fallback_url=${encodeURIComponent(webUrl)};end`
                 },
                 deezer: {
                     ios: "deezer://www.deezer.com/album/927562671",
-                    android: "intent://www.deezer.com/album/927562671#Intent;package=deezer.android.app;scheme=https;end"
+                    android: `intent://www.deezer.com/album/927562671#Intent;package=deezer.android.app;scheme=https;S.browser_fallback_url=${encodeURIComponent(webUrl)};end`
                 },
                 youtube: {
                     ios: "youtubemusic://music.youtube.com/playlist?list=OLAK5uy_l1jQK4tpXSpVEF8ITQLCyHLGq9jdChC-g",
-                    android: "intent://music.youtube.com/playlist?list=OLAK5uy_l1jQK4tpXSpVEF8ITQLCyHLGq9jdChC-g#Intent;package=com.google.android.apps.youtube.music;scheme=https;end"
+                    android: `intent://music.youtube.com/playlist?list=OLAK5uy_l1jQK4tpXSpVEF8ITQLCyHLGq9jdChC-g#Intent;package=com.google.android.apps.youtube.music;scheme=https;S.browser_fallback_url=${encodeURIComponent(webUrl)};end`
                 }
             };
 
             if (isAndroid) {
                 appUrl = platformConfig[platform].android;
+                window.location.href = appUrl;
             } else if (isIOS) {
                 appUrl = platformConfig[platform].ios;
+                window.location.href = appUrl;
+                
+                // Fallback manual para iOS (pois o iOS não suporta o parâmetro S.browser_fallback_url)
+                setTimeout(() => {
+                    if (!document.hidden && !document.webkitHidden) {
+                        window.location.href = webUrl;
+                    }
+                }, 2000);
             } else {
                 window.location.href = webUrl;
-                return;
             }
-
-            // Tenta abrir o App
-            window.location.href = appUrl;
-
-            // Plano B: Fallback para Web se o App não abrir em 2 segundos
-            setTimeout(() => {
-                if (!document.hidden && !document.webkitHidden) {
-                    window.location.href = webUrl;
-                }
-            }, 2000);
         });
     });
 
