@@ -44,8 +44,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     android: "intent://www.deezer.com/album/927562671#Intent;package=deezer.android.app;scheme=https;end"
                 },
                 'youtube-music': {
-                    ios: "youtubemusic://playlist?list=OLAK5uy_l1jQK4tpXSpVEF8ITQLCyHLGq9jdChC-g",
-                    android: "intent://playlist?list=OLAK5uy_l1jQK4tpXSpVEF8ITQLCyHLGq9jdChC-g#Intent;scheme=youtubemusic;package=com.google.android.apps.youtube.music;end"
+                    ios: "youtubemusic://music.youtube.com/playlist?list=OLAK5uy_l1jQK4tpXSpVEF8ITQLCyHLGq9jdChC-g",
+                    android: "intent://music.youtube.com/playlist?list=OLAK5uy_l1jQK4tpXSpVEF8ITQLCyHLGq9jdChC-g#Intent;scheme=https;package=com.google.android.apps.youtube.music;S.browser_fallback_url=https://music.youtube.com/playlist?list=OLAK5uy_l1jQK4tpXSpVEF8ITQLCyHLGq9jdChC-g;end"
                 },
                 'youtube-main': {
                     ios: "youtube://www.youtube.com/@MindofaDeadBody",
